@@ -1,0 +1,112 @@
+Methods Covered :-
+     1 - start()
+     2 - run()
+     3 - sleep()
+     4 - join()
+
+public class MyThread extends Thread{
+    @Override
+    public void run() {
+        for (int i = 1; i <= 5; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println(i);
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        MyThread t1 = new MyThread();
+        t1.start();
+        t1.join();
+        System.out.println("End of Main Thread");
+    }
+}
+
+//----------------------------------------------------------------------------------------------
+Method Covered:-
+    1 - setPriority();
+    public class MyThread extends Thread{
+
+        //Custom name to Thread
+        public MyThread(String name)
+        {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            // This is not Strict, as we have more cores right now so parallel execution is quite possible.
+            for (int i = 1; i <= 5; i++) {
+                String a = "";
+                for (int j = 0; j < 100000; j++) {
+                    a+="a";
+                }
+                System.out.println(Thread.currentThread().getName() + " - Priority: "+ Thread.currentThread().getPriority() + " - Count: " + i);
+                try{
+                    Thread.sleep(100);
+                } catch(Exception e)
+                {
+                    System.out.println(e);
+                }
+            }
+        }
+
+        public static void main(String[] args) throws InterruptedException {
+            Thread l = new MyThread("Low Priority Thread");
+            Thread m = new MyThread("Medium Priority Thread");
+            Thread h = new MyThread("High Priority Thread");
+            l.setPriority(Thread.MIN_PRIORITY);
+            m.setPriority(Thread.NORM_PRIORITY);
+            h.setPriority(Thread.MAX_PRIORITY);
+            l.start();
+            m.start();
+            h.start();
+        }
+    }
+
+//----------------------------------------------------------------------------------------------
+Method Covered: -
+    1 - interrupt()
+    public class MyThread extends Thread{
+
+        @Override
+        public void run() {
+            try{
+                Thread.sleep(1000);
+            } catch(InterruptedException e)
+            {
+                System.out.println("Thread interrupted while sleeping: "+e);
+            }
+        }
+
+        public static void main(String[] args) throws InterruptedException {
+            MyThread t1 = new MyThread();
+            t1.start();
+            t1.interrupt(); // This means, whatever we are doing sleep or running , Interrupt that right now.
+        }
+    }
+
+//----------------------------------------------------------------------------------------------
+Method Covered:-
+ 1 - yield();
+ public class MyThread extends Thread{
+
+     @Override
+     public void run() {
+         for (int i = 0; i < 5; i++) {
+             System.out.println(Thread.currentThread().getName() + " is running");
+             Thread.yield(); // Hint to the OS scheduler, to give chance to other Thread first!! HINT
+         }
+     }
+
+     public static void main(String[] args) throws InterruptedException {
+         MyThread t1 = new MyThread();
+         MyThread t2 = new MyThread();
+
+         t1.start();
+         t2.start();
+     }
+ }
