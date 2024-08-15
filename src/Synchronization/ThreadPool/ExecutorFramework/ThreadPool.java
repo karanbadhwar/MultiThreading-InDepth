@@ -3,60 +3,68 @@ package Synchronization.ThreadPool.ExecutorFramework;
 //We Use Executor Framework to Operate upon Thread Pool.
 // There are Three Core Interfaces -> Executor, ExecutorService and ScheduledExecutorService
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class ThreadPool {
-    public static void main(String[] args) {
-        long startTime = System.currentTimeMillis();
-//        Thread[] threads = new Thread[9];
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+    public static void main(String[] args){
+//        ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        for (int i = 1; i < 10; i++) {
-            int finalI = i;
-//            executor.execute(() -> { //Execute methods does not have Shutdown Method, as it is from Executor Interface.
-//                long result = factorial(finalI);
-//                System.out.println(result);
-//            });
+        //In the Submit, it accepts Runnable or Callable, over here eCallable is being accepted, as Callable returns a Value.
+//        Future<?> future = executorService.submit(() -> 42);
 
-            executor.submit(() -> {
-                long result = factorial(finalI);
-                System.out.println(result);
-            });
+//        Callable<Integer> callable = () -> 42;
 
+//        System.out.println(future.get()); //Get method will wait unt il the method above executes
+//        System.out.println(future.isDone());
+//        executorService.shutdown();
 
+        //Third Way of calling submit Method on executorService
+//        Future<String> future = executorService.submit(() -> System.out.println("Hello"), "Success");
+//        System.out.println(future.get());
 
-        }
-        executor.shutdown();
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
 
+        Callable<Integer> callable1 = () -> {
+            System.out.println("Task 1");
+            Thread.sleep(1000);
+            return 1;
+        };
+        Callable<Integer> callable2 = () -> {
+            System.out.println("Task 2");
+            Thread.sleep(1000);
+            return 2;
+        };;
+        Callable<Integer> callable3 = () -> {
+            System.out.println("Task 3");
+            Thread.sleep(1000);
+            return 3;
+        };;
+
+        List<Callable<Integer>> list = Arrays.asList(callable1,callable2,callable3);
+
+        //invokeAll() locks the further Tasks of the Calling Thread, until all the tasks have been executed.
+//        List<Future<Integer>> futures = executorService.invokeAll(list);
+
+        //This will only invoke the methods until the Given TIme.
+        List<Future<Integer>> futures = null;
         try {
-            // Same as Join() but with some conditions
-//            executor.awaitTermination(10, TimeUnit.SECONDS); // Returns Boolean
-
-            //But if needed unlimited Time until all methods have been executed...
-            while(!executor.awaitTermination(1, TimeUnit.SECONDS))
-            {
-                System.out.println("Waiting...");
-            }
+            futures = executorService.invokeAll(list,1, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        System.out.println("Total Time: " + (System.currentTimeMillis() - startTime));
-    }
+        for (Future<Integer> f: futures)
+        {
+            try {
+                System.out.println(f.get());
+            } catch (Exception e) {
 
-    public static long factorial(int n) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            System.out.println(e.getMessage());
+            }
         }
-        long result = 1;
-        for (int i = n; i > 0; i--) {
-            result *= i;
-        }
-        return result;
+        executorService.shutdown();
+        System.out.println("End of Main Thread");
+
     }
 }
