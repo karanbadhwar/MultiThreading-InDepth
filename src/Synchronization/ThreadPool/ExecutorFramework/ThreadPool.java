@@ -48,21 +48,33 @@ public class ThreadPool {
 //        List<Future<Integer>> futures = executorService.invokeAll(list);
 
         //This will only invoke the methods until the Given TIme.
-        List<Future<Integer>> futures = null;
+//        List<Future<Integer>> futures = null;
+////        try {
+////            futures = executorService.invokeAll(list,1, TimeUnit.SECONDS);
+////        } catch (InterruptedException e) {
+////            throw new RuntimeException(e);
+////        }
+////
+////        for (Future<Integer> f: futures)
+////        {
+////            try {
+////                System.out.println(f.get());
+////            } catch (Exception e) {
+////
+////            }
+////        }
+
+
         try {
-            futures = executorService.invokeAll(list,1, TimeUnit.SECONDS);
+            Integer i = executorService.invokeAny(list);
+            System.out.println(i);
         } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
 
-        for (Future<Integer> f: futures)
-        {
-            try {
-                System.out.println(f.get());
-            } catch (Exception e) {
 
-            }
-        }
         executorService.shutdown();
         System.out.println("End of Main Thread");
 
