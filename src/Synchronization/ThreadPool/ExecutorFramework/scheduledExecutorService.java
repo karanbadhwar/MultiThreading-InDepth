@@ -14,7 +14,7 @@ public class scheduledExecutorService {
 
         SE.scheduleAtFixedRate(() -> System.out.println("Task Executed after every 5 seconds delay !"), 5, 5, TimeUnit.SECONDS);
 
-        SE.scheduleWithFixedDelay(() -> System.out.println("Task Executed after every 5 seconds delay, but first will run after more 5 seconds !"), 5, 5, TimeUnit.SECONDS)
+        SE.scheduleWithFixedDelay(() -> System.out.println("Task Executed after every 5 seconds delay, but first will run after more 5 seconds !"), 5, 5, TimeUnit.SECONDS);
 
         SE.schedule(() -> {
             System.out.println("Initiating Shutdown...");
