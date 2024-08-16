@@ -2,7 +2,9 @@ package Synchronization.ThreadPool.ExecutorFramework;
 
 import java.util.concurrent.*;
 
-public class CountDownLatchExample {
+//EXECUTORS SERVICES CAN RUN THREAD WITH THREAD CLASS INSTANCE/ RUNNABLE/ CALLABLE!! While Manual Threads cannot run with Callable.
+
+public class CountDownLatchWithExecutors {
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
         int numberOfServices = 3;
