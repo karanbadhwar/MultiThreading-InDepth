@@ -5,40 +5,48 @@ import java.util.concurrent.*;
 public class CyclicBarrierExample {
 
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        public static void main (String[] args){
+            int numberOfSubsystems = 4;
+            CyclicBarrier barrier = new CyclicBarrier(numberOfSubsystems, new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("All subsystems are up and running. System startup complete.");
+                }
+            });
 
-        int numberOfServices = 3;
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
-        //We Use CountDownLatch is used, when we want to make 1 or more than 1 Threads WAIT!!.
-        //In the Constructor, we give the no. of Operations we want to conduct.
-        CyclicBarrier barrier = new CyclicBarrier(numberOfServices);
-        executorService.submit(new DependentServiceWithCyclicBarrier(barrier));
-        executorService.submit(new DependentServiceWithCyclicBarrier(barrier));
-        executorService.submit(new DependentServiceWithCyclicBarrier(barrier));
+            Thread webServerThread = new Thread(new Subsystem("Web Server", 2000, barrier));
+            Thread databaseThread = new Thread(new Subsystem("Database", 4000, barrier));
+            Thread cacheThread = new Thread(new Subsystem("Cache", 3000, barrier));
+            Thread messagingServiceThread = new Thread(new Subsystem("Messaging Service", 3500, barrier));
 
-        //This does not block the Main Thread!!
-        System.out.println("All Dependent Services finished. Starting main service...");
-//        System.out.println(barrier.getNumberWaiting());
-        executorService.shutdown();
+            webServerThread.start();
+            databaseThread.start();
+            cacheThread.start();
+            messagingServiceThread.start();
 
-    }
-}
-
-class DependentServiceWithCyclicBarrier implements Callable<String> {
-
-    private final CyclicBarrier barrier;
-
-    public DependentServiceWithCyclicBarrier(CyclicBarrier barrier) {
-        this.barrier = barrier;
+        }
     }
 
+    class Subsystem implements Runnable {
+        private String name;
+        private int initializationTime;
+        private CyclicBarrier barrier;
 
-    @Override
-    public String call() throws Exception {
-        System.out.println(Thread.currentThread().getName() + " service started");
-        Thread.sleep(2000);
-        System.out.println(Thread.currentThread().getName() + " is waiting ath the barrier ");
-        barrier.await(); // This makes sure every worker Thread has arrived at this step, as Object of barrier is being passed from the top. So it keeps Track.
-        return "ok";
+        public Subsystem(String name, int initializationTime, CyclicBarrier barrier) {
+            this.name = name;
+            this.initializationTime = initializationTime;
+            this.barrier = barrier;
+        }
+
+        @Override
+        public void run() {
+            try {
+                System.out.println(name + " initialization started.");
+                Thread.sleep(initializationTime); // Simulate time taken to initialize
+                System.out.println(name + " initialization complete.");
+                barrier.await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
+        }
     }
-}
